@@ -35,8 +35,9 @@ pages_map(void *addr, size_t size, bool *commit)
 
 	assert(size != 0);
 
-	if (os_overcommits)
-		*commit = true;
+#ifdef JEMALLOC_ENABLE_OVERCOMMIT
+	*commit = true;
+#endif
 
 #ifdef _WIN32
 	/*
@@ -139,9 +140,9 @@ pages_trim(void *addr, size_t alloc_size, size_t leadsize, size_t size,
 static bool
 pages_commit_impl(void *addr, size_t size, bool commit)
 {
-
-	if (os_overcommits)
-		return (true);
+#ifdef JEMALLOC_ENABLE_OVERCOMMIT
+	return (true);
+#else
 
 #ifdef _WIN32
 	return (commit ? (addr != VirtualAlloc(addr, size, MEM_COMMIT,
@@ -163,6 +164,7 @@ pages_commit_impl(void *addr, size_t size, bool commit)
 		}
 		return (false);
 	}
+#endif
 #endif
 }
 
@@ -209,47 +211,6 @@ pages_purge(void *addr, size_t size)
 	return (unzeroed);
 }
 
-#ifdef JEMALLOC_SYSCTL_VM_OVERCOMMIT
-static bool
-os_overcommits_sysctl(void)
-{
-	int vm_overcommit;
-	size_t sz;
-
-	sz = sizeof(vm_overcommit);
-	if (sysctlbyname("vm.overcommit", &vm_overcommit, &sz, NULL, 0) != 0)
-		return (false); /* Error. */
-
-	return ((vm_overcommit & 0x3) == 0);
-}
-#endif
-
-#ifdef JEMALLOC_PROC_SYS_VM_OVERCOMMIT_MEMORY
-static bool
-os_overcommits_proc(void)
-{
-	int fd;
-	char buf[1];
-	ssize_t nread;
-
-	fd = open("/proc/sys/vm/overcommit_memory", O_RDONLY);
-	if (fd == -1)
-		return (false); /* Error. */
-
-	nread = read(fd, &buf, sizeof(buf));
-	close(fd);
-	if (nread < 1)
-		return (false); /* Error. */
-	/*
-	 * /proc/sys/vm/overcommit_memory meanings:
-	 * 0: Heuristic overcommit.
-	 * 1: Always overcommit.
-	 * 2: Never overcommit.
-	 */
-	return (buf[0] == '0' || buf[0] == '1');
-}
-#endif
-
 void
 pages_boot(void)
 {
@@ -258,15 +219,7 @@ pages_boot(void)
 	mmap_flags = MAP_PRIVATE | MAP_ANON;
 #endif
 
-#ifdef JEMALLOC_SYSCTL_VM_OVERCOMMIT
-	os_overcommits = os_overcommits_sysctl();
-#elif defined(JEMALLOC_PROC_SYS_VM_OVERCOMMIT_MEMORY)
-	os_overcommits = os_overcommits_proc();
-#  ifdef MAP_NORESERVE
-	if (os_overcommits)
-		mmap_flags |= MAP_NORESERVE;
-#  endif
-#else
-	os_overcommits = false;
+#ifdef JEMALLOC_ENABLE_OVERCOMMIT
+	mmap_flags |= MAP_NORESERVE;
 #endif
 }
