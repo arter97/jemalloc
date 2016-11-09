@@ -28,7 +28,7 @@
 #endif
 
 /* Defined if C11 atomics are available. */
-#define JEMALLOC_C11ATOMICS 
+#define JEMALLOC_C11ATOMICS 1
 
 /* Defined if the equivalent of FreeBSD's atomic(9) functions are available. */
 /* #undef JEMALLOC_ATOMIC9 */
