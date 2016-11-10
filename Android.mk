@@ -97,6 +97,7 @@ jemalloc_lib_src_files := \
 	src/prof.c \
 	src/quarantine.c \
 	src/rtree.c \
+	src/spin.c \
 	src/stats.c \
 	src/tcache.c \
 	src/ticker.c \
