@@ -13,6 +13,7 @@
 #  define PAGES_PROT_DECOMMIT (PROT_NONE)
 static int	mmap_flags;
 #endif
+#define JEMALLOC_ENABLE_OVERCOMMIT
 static bool	os_overcommits;
 
 /******************************************************************************/
