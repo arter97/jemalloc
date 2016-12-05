@@ -77,7 +77,8 @@
 /* #undef JEMALLOC_OSSPIN */
 
 /* Defined if syscall(2) is available. */
-#define JEMALLOC_HAVE_SYSCALL 
+/* Syscalls are available in Android, but avoid them for security reasons. */
+/* #undef JEMALLOC_HAVE_SYSCALL */
 
 /*
  * Defined if secure_getenv(3) is available.
@@ -169,7 +170,7 @@
  * JEMALLOC_DSS enables use of sbrk(2) to allocate chunks from the data storage
  * segment (DSS).
  */
-#define JEMALLOC_DSS 
+/* #undef JEMALLOC_DSS */
 
 /* Support memory filling (junk/zero/quarantine/redzone). */
 #define JEMALLOC_FILL 
