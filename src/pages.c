@@ -191,15 +191,16 @@ pages_purge(void *addr, size_t size)
 #ifdef _WIN32
 	VirtualAlloc(addr, size, MEM_RESET, PAGE_READWRITE);
 	unzeroed = true;
-#elif defined(JEMALLOC_HAVE_MADVISE)
-#  ifdef JEMALLOC_PURGE_MADVISE_DONTNEED
-#    define JEMALLOC_MADV_PURGE MADV_DONTNEED
-#    define JEMALLOC_MADV_ZEROS true
-#  elif defined(JEMALLOC_PURGE_MADVISE_FREE)
+#elif (defined(JEMALLOC_PURGE_MADVISE_FREE) || \
+    defined(JEMALLOC_PURGE_MADVISE_DONTNEED))
+#  if defined(JEMALLOC_PURGE_MADVISE_FREE)
 #    define JEMALLOC_MADV_PURGE MADV_FREE
 #    define JEMALLOC_MADV_ZEROS false
+#  elif defined(JEMALLOC_PURGE_MADVISE_DONTNEED)
+#    define JEMALLOC_MADV_PURGE MADV_DONTNEED
+#    define JEMALLOC_MADV_ZEROS true
 #  else
-#    error "No madvise(2) flag defined for purging unused dirty pages."
+#    error No madvise(2) flag defined for purging unused dirty pages
 #  endif
 	int err = madvise(addr, size, JEMALLOC_MADV_PURGE);
 	unzeroed = (!JEMALLOC_MADV_ZEROS || err != 0);
@@ -210,6 +211,34 @@ pages_purge(void *addr, size_t size)
 	unzeroed = true;
 #endif
 	return (unzeroed);
+}
+
+bool
+pages_huge(void *addr, size_t size)
+{
+
+	assert(PAGE_ADDR2BASE(addr) == addr);
+	assert(PAGE_CEILING(size) == size);
+
+#ifdef JEMALLOC_THP
+	return (madvise(addr, size, MADV_HUGEPAGE) != 0);
+#else
+	return (false);
+#endif
+}
+
+bool
+pages_nohuge(void *addr, size_t size)
+{
+
+	assert(PAGE_ADDR2BASE(addr) == addr);
+	assert(PAGE_CEILING(size) == size);
+
+#ifdef JEMALLOC_THP
+	return (madvise(addr, size, MADV_NOHUGEPAGE) != 0);
+#else
+	return (false);
+#endif
 }
 
 void
