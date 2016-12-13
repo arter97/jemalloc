@@ -34,6 +34,8 @@ UNIT_TESTS=( \
   "mq" \
   "mtx" \
   "nstime" \
+  "pack" \
+  "pages" \
   "prng" \
   "prof_accum" \
   "prof_active" \

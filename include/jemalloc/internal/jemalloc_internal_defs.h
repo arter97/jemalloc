@@ -72,7 +72,7 @@
 /* #undef JEMALLOC_OSSPIN */
 
 /* Defined if syscall(2) is usable. */
-/* Syscalls are usable in Android, but avoid them for security reasons. */
+/* Syscalls are available in Android, but avoid them for security reasons. */
 /* #undef JEMALLOC_USE_SYSCALL */
 
 /*
@@ -86,7 +86,7 @@
 /* #undef JEMALLOC_HAVE_ISSETUGID */
 
 /* Defined if pthread_atfork(3) is available. */
-#define JEMALLOC_HAVE_PTHREAD_ATFORK
+#define JEMALLOC_HAVE_PTHREAD_ATFORK 
 
 /*
  * Defined if clock_gettime(CLOCK_MONOTONIC_COARSE, ...) is available.
@@ -255,10 +255,10 @@
  * JEMALLOC_SYSCTL_VM_OVERCOMMIT: FreeBSD's vm.overcommit sysctl.
  */
 /* #undef JEMALLOC_SYSCTL_VM_OVERCOMMIT */
-#define JEMALLOC_PROC_SYS_VM_OVERCOMMIT_MEMORY
+#define JEMALLOC_PROC_SYS_VM_OVERCOMMIT_MEMORY 
 
 /* Defined if madvise(2) is available. */
-#define JEMALLOC_HAVE_MADVISE
+#define JEMALLOC_HAVE_MADVISE 
 
 /*
  * Methods for purging unused pages differ between operating systems.
@@ -270,13 +270,14 @@
  *                                 address region is later touched.
  */
 /* #undef JEMALLOC_PURGE_MADVISE_FREE */
-#define JEMALLOC_PURGE_MADVISE_DONTNEED
+#define JEMALLOC_PURGE_MADVISE_DONTNEED 
 
 /*
  * Defined if transparent huge pages are supported via the MADV_[NO]HUGEPAGE
  * arguments to madvise(2).
  */
-#define JEMALLOC_THP
+/* ANDROID: Do not enable huge pages because it can increase PSS. */
+/* #undef JEMALLOC_THP */
 
 /* Define if operating system has alloca.h header. */
 #define JEMALLOC_HAS_ALLOCA_H 1

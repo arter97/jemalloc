@@ -24,7 +24,7 @@ extern "C" {
  */
 #define	JEMALLOC_OVERRIDE_MEMALIGN
 #ifndef __LP64__
-#define JEMALLOC_OVERRIDE_VALLOC
+#define JEMALLOC_OVERRIDE_VALLOC 
 #endif
 
 /*
@@ -41,7 +41,7 @@ extern "C" {
  * with C++.  The only justification for this is to match the prototypes that
  * glibc defines.
  */
-/* #undef	JEMALLOC_USE_CXX_THROW */
+/* #undef JEMALLOC_USE_CXX_THROW */
 
 #ifdef _MSC_VER
 #  ifdef _WIN64
