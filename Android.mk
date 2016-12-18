@@ -60,6 +60,12 @@ jemalloc_common_cflags += \
         -DANDROID_TCACHE_NSLOTS_LARGE=16
 endif
 
+# Enable Jemalloc THP support if the target
+# specifies that its kernel supports THP.
+ifeq ($(TARGET_SUPPORTS_THP),true)
+jemalloc_common_cflags += -DJEMALLOC_THP
+endif
+
 # Use a 512K chunk size on 32 bit systems.
 # This keeps the total amount of virtual address space consumed
 # by jemalloc lower.

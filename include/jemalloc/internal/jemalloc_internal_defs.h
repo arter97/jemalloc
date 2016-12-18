@@ -276,7 +276,7 @@
  * Defined if transparent huge pages are supported via the MADV_[NO]HUGEPAGE
  * arguments to madvise(2).
  */
-/* ANDROID: Do not enable huge pages because it can increase PSS. */
+/* ANDROID: Since not all targets support THP in kernel, this is handled by Makefile. */
 /* #undef JEMALLOC_THP */
 
 /* Define if operating system has alloca.h header. */
