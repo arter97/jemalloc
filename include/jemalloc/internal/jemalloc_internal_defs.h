@@ -262,6 +262,7 @@
 /*
  * Defined if transparent huge pages are supported via the MADV_[NO]HUGEPAGE
  * arguments to madvise(2).
+ * ANDROID: Since not all targets support THP in kernel, this is handled in Makefile.
  */
 /* #undef JEMALLOC_HAVE_MADVISE_HUGE */
 

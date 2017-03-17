@@ -69,7 +69,8 @@ endif
 # Enable Jemalloc THP support if the target
 # specifies that its kernel supports THP.
 ifeq ($(TARGET_SUPPORTS_THP),true)
-jemalloc_common_cflags += -DJEMALLOC_THP
+  jemalloc_common_cflags += -DJEMALLOC_THP
+  jemalloc_common_cflags += -DJEMALLOC_HAVE_MADVISE_HUGE
 endif
 
 # Use a 512K chunk size on 32 bit systems.
