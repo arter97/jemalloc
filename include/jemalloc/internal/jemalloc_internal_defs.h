@@ -246,7 +246,6 @@
  * Darwin (OS X) uses zones to work around Mach-O symbol override shortcomings.
  */
 /* #undef JEMALLOC_ZONE */
-/* #undef JEMALLOC_ZONE_VERSION */
 
 /*
  * Methods for determining whether the OS overcommits.
@@ -261,6 +260,12 @@
 #define JEMALLOC_HAVE_MADVISE 
 
 /*
+ * Defined if transparent huge pages are supported via the MADV_[NO]HUGEPAGE
+ * arguments to madvise(2).
+ */
+/* #undef JEMALLOC_HAVE_MADVISE_HUGE */
+
+/*
  * Methods for purging unused pages differ between operating systems.
  *
  *   madvise(..., MADV_FREE) : This marks pages as being unused, such that they
@@ -272,10 +277,7 @@
 /* #undef JEMALLOC_PURGE_MADVISE_FREE */
 #define JEMALLOC_PURGE_MADVISE_DONTNEED 
 
-/*
- * Defined if transparent huge pages are supported via the MADV_[NO]HUGEPAGE
- * arguments to madvise(2).
- */
+/* Defined if transparent huge page support is enabled. */
 /* ANDROID: Since not all targets support THP in kernel, this is handled by Makefile. */
 /* #undef JEMALLOC_THP */
 
