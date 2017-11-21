@@ -6,12 +6,8 @@
 
 bool		opt_thp = true;
 #if defined(__ANDROID__)
-  #ifdef JEMALLOC_HAVE_MADVISE_HUGE
-    // Assume CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS is enabled
-    static const bool	thp_initially_huge = true;
-  #else
-    static const bool	thp_initially_huge = false;
-  #endif
+  // Assume CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS is disabled
+  static const bool	thp_initially_huge = false;
 #else
   static bool	thp_initially_huge;
 #endif
