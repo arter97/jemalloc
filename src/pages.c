@@ -26,7 +26,7 @@ static size_t	os_page;
 #  define PAGES_PROT_DECOMMIT (PROT_NONE)
 static int	mmap_flags;
 #endif
-static bool	os_overcommits;
+static const bool	os_overcommits = true;
 
 const char *thp_mode_names[] = {
 	"default",
@@ -34,8 +34,8 @@ const char *thp_mode_names[] = {
 	"never",
 	"not supported"
 };
-thp_mode_t opt_thp = THP_MODE_DEFAULT;
-thp_mode_t init_system_thp_mode;
+const thp_mode_t opt_thp = THP_MODE_DEFAULT;
+const thp_mode_t init_system_thp_mode = thp_mode_default;
 
 /* Runtime support for lazy purge. Irrelevant when !pages_can_purge_lazy. */
 static bool pages_can_purge_lazy_runtime = true;
@@ -512,6 +512,7 @@ pages_set_thp_state (void *ptr, size_t size) {
 	}
 }
 
+#if 0
 static void
 init_thp_state(void) {
 	if (!have_madvise_huge) {
@@ -557,6 +558,7 @@ init_thp_state(void) {
 label_error:
 	opt_thp = init_system_thp_mode = thp_mode_not_supported;
 }
+#endif
 
 bool
 pages_boot(void) {
@@ -573,6 +575,7 @@ pages_boot(void) {
 	mmap_flags = MAP_PRIVATE | MAP_ANON;
 #endif
 
+#if 0
 #ifdef JEMALLOC_SYSCTL_VM_OVERCOMMIT
 	os_overcommits = os_overcommits_sysctl();
 #elif defined(JEMALLOC_PROC_SYS_VM_OVERCOMMIT_MEMORY)
@@ -587,6 +590,7 @@ pages_boot(void) {
 #endif
 
 	init_thp_state();
+#endif
 
 	/* Detect lazy purge runtime support. */
 	if (pages_can_purge_lazy) {

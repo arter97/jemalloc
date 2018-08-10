@@ -68,8 +68,8 @@ typedef enum {
 } thp_mode_t;
 
 #define THP_MODE_DEFAULT thp_mode_default
-extern thp_mode_t opt_thp;
-extern thp_mode_t init_system_thp_mode; /* Initial system wide state. */
+extern const thp_mode_t opt_thp;
+extern const thp_mode_t init_system_thp_mode; /* Initial system wide state. */
 extern const char *thp_mode_names[];
 
 void *pages_map(void *addr, size_t size, size_t alignment, bool *commit);

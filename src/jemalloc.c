@@ -868,6 +868,7 @@ malloc_slow_flag_init(void) {
 	malloc_slow = (malloc_slow_flags != 0);
 }
 
+#if 0
 static void
 malloc_conf_init(void) {
 	unsigned i;
@@ -1244,6 +1245,7 @@ malloc_conf_init(void) {
 	}
 	atomic_store_b(&log_init_done, true, ATOMIC_RELEASE);
 }
+#endif
 
 static bool
 malloc_init_hard_needed(void) {
@@ -1278,7 +1280,7 @@ malloc_init_hard_a0_locked() {
 	if (config_prof) {
 		prof_boot0();
 	}
-	malloc_conf_init();
+	//malloc_conf_init();
 	if (opt_stats_print) {
 		/* Print statistics at exit. */
 		if (atexit(stats_print_atexit) != 0) {
