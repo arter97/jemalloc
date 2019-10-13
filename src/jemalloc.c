@@ -1017,6 +1017,7 @@ obtain_malloc_conf(unsigned which_source, char buf[PATH_MAX + 1]) {
 	return ret;
 }
 
+#if 0
 static void
 malloc_conf_init_helper(sc_data_t *sc_data, unsigned bin_shard_sizes[SC_NBINS],
     bool initial_call, const char *opts_cache[MALLOC_CONF_NSOURCES],
@@ -1446,7 +1447,7 @@ malloc_conf_init(sc_data_t *sc_data, unsigned bin_shard_sizes[SC_NBINS]) {
 	malloc_conf_init_helper(sc_data, bin_shard_sizes, false, opts_cache,
 	    NULL);
 }
-
+#endif
 #undef MALLOC_CONF_NSOURCES
 
 static bool
@@ -1502,7 +1503,7 @@ malloc_init_hard_a0_locked() {
 	if (config_prof) {
 		prof_boot0();
 	}
-	malloc_conf_init(&sc_data, bin_shard_sizes);
+	// malloc_conf_init(&sc_data, bin_shard_sizes);
 	sz_boot(&sc_data);
 	bin_boot(&sc_data, bin_shard_sizes);
 
