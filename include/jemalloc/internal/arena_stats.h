@@ -103,7 +103,6 @@ struct arena_stats_s {
 	atomic_zu_t		base; /* Derived. */
 	atomic_zu_t		internal;
 	atomic_zu_t		resident; /* Derived. */
-	atomic_zu_t		metadata_thp;
 
 	atomic_zu_t		allocated_large; /* Derived. */
 	arena_stats_u64_t	nmalloc_large; /* Derived. */

@@ -1116,8 +1116,7 @@ extent_need_manual_zero(arena_t *arena) {
 	 * default extent hooks installed (in which case the purge semantics may
 	 * change); or 2) transparent huge pages enabled.
 	 */
-	return (!arena_has_default_hooks(arena) ||
-		(opt_thp == thp_mode_always));
+	return !arena_has_default_hooks(arena);
 }
 
 /*
@@ -1241,9 +1240,6 @@ extent_alloc_default_impl(tsdn_t *tsdn, arena_t *arena, void *new_addr,
 	void *ret = extent_alloc_core(tsdn, arena, new_addr, size, alignment, zero,
 	    commit, (dss_prec_t)atomic_load_u(&arena->dss_prec,
 	    ATOMIC_RELAXED));
-	if (have_madvise_huge && ret) {
-		pages_set_thp_state(ret, size);
-	}
 	return ret;
 }
 

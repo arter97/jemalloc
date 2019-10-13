@@ -1175,23 +1175,6 @@ malloc_conf_init_helper(sc_data_t *sc_data, unsigned bin_shard_sizes[SC_NBINS],
 
 			CONF_HANDLE_BOOL(opt_abort, "abort")
 			CONF_HANDLE_BOOL(opt_abort_conf, "abort_conf")
-			if (strncmp("metadata_thp", k, klen) == 0) {
-				int i;
-				bool match = false;
-				for (i = 0; i < metadata_thp_mode_limit; i++) {
-					if (strncmp(metadata_thp_mode_names[i],
-					    v, vlen) == 0) {
-						opt_metadata_thp = i;
-						match = true;
-						break;
-					}
-				}
-				if (!match) {
-					CONF_ERROR("Invalid conf value",
-					    k, klen, v, vlen);
-				}
-				CONF_CONTINUE;
-			}
 			CONF_HANDLE_BOOL(opt_retain, "retain")
 			if (strncmp("dss", k, klen) == 0) {
 				int i;
@@ -1390,27 +1373,6 @@ malloc_conf_init_helper(sc_data_t *sc_data, unsigned bin_shard_sizes[SC_NBINS],
 					log_var_names[cpylen] = '\0';
 					CONF_CONTINUE;
 				}
-			}
-			if (CONF_MATCH("thp")) {
-				bool match = false;
-				for (int i = 0; i < thp_mode_names_limit; i++) {
-					if (strncmp(thp_mode_names[i],v, vlen)
-					    == 0) {
-						if (!have_madvise_huge) {
-							CONF_ERROR(
-							    "No THP support",
-							    k, klen, v, vlen);
-						}
-						opt_thp = i;
-						match = true;
-						break;
-					}
-				}
-				if (!match) {
-					CONF_ERROR("Invalid conf value",
-					    k, klen, v, vlen);
-				}
-				CONF_CONTINUE;
 			}
 			CONF_ERROR("Invalid conf pair", k, klen, v, vlen);
 #undef CONF_ERROR

@@ -28,15 +28,6 @@ static int	mmap_flags;
 #endif
 #define os_overcommits true
 
-const char *thp_mode_names[] = {
-	"default",
-	"always",
-	"never",
-	"not supported"
-};
-thp_mode_t opt_thp = THP_MODE_DEFAULT;
-thp_mode_t init_system_thp_mode;
-
 /* Runtime support for lazy purge. Irrelevant when !pages_can_purge_lazy. */
 static bool pages_can_purge_lazy_runtime = true;
 
@@ -526,75 +517,6 @@ os_overcommits_proc(void) {
 }
 #endif
 
-void
-pages_set_thp_state (void *ptr, size_t size) {
-	if (opt_thp == thp_mode_default || opt_thp == init_system_thp_mode) {
-		return;
-	}
-	assert(opt_thp != thp_mode_not_supported &&
-	    init_system_thp_mode != thp_mode_not_supported);
-
-	if (opt_thp == thp_mode_always
-	    && init_system_thp_mode != thp_mode_never) {
-		assert(init_system_thp_mode == thp_mode_default);
-		pages_huge_unaligned(ptr, size);
-	} else if (opt_thp == thp_mode_never) {
-		assert(init_system_thp_mode == thp_mode_default ||
-		    init_system_thp_mode == thp_mode_always);
-		pages_nohuge_unaligned(ptr, size);
-	}
-}
-
-static void
-init_thp_state(void) {
-	if (!have_madvise_huge) {
-		if (metadata_thp_enabled() && opt_abort) {
-			malloc_write("<jemalloc>: no MADV_HUGEPAGE support\n");
-			abort();
-		}
-		goto label_error;
-	}
-
-	static const char sys_state_madvise[] = "always [madvise] never\n";
-	static const char sys_state_always[] = "[always] madvise never\n";
-	static const char sys_state_never[] = "always madvise [never]\n";
-	char buf[sizeof(sys_state_madvise)];
-
-#if defined(JEMALLOC_USE_SYSCALL) && defined(SYS_open)
-	int fd = (int)syscall(SYS_open,
-	    "/sys/kernel/mm/transparent_hugepage/enabled", O_RDONLY);
-#else
-	int fd = open("/sys/kernel/mm/transparent_hugepage/enabled", O_RDONLY);
-#endif
-	if (fd == -1) {
-		goto label_error;
-	}
-
-	ssize_t nread = malloc_read_fd(fd, &buf, sizeof(buf));
-#if defined(JEMALLOC_USE_SYSCALL) && defined(SYS_close)
-	syscall(SYS_close, fd);
-#else
-	close(fd);
-#endif
-
-        if (nread < 0) {
-		goto label_error; 
-        }
-
-	if (strncmp(buf, sys_state_madvise, (size_t)nread) == 0) {
-		init_system_thp_mode = thp_mode_default;
-	} else if (strncmp(buf, sys_state_always, (size_t)nread) == 0) {
-		init_system_thp_mode = thp_mode_always;
-	} else if (strncmp(buf, sys_state_never, (size_t)nread) == 0) {
-		init_system_thp_mode = thp_mode_never;
-	} else {
-		goto label_error;
-	}
-	return;
-label_error:
-	opt_thp = init_system_thp_mode = thp_mode_not_supported;
-}
-
 bool
 pages_boot(void) {
 	os_page = os_page_detect();
@@ -609,7 +531,6 @@ pages_boot(void) {
 #ifndef _WIN32
 	mmap_flags = MAP_PRIVATE | MAP_ANON;
 #endif
-	init_thp_state();
 
 #ifdef __FreeBSD__
 	/*

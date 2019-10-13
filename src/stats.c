@@ -664,7 +664,7 @@ stats_arena_print(emitter_t *emitter, unsigned i, bool bins, bool large,
 	const char *dss;
 	ssize_t dirty_decay_ms, muzzy_decay_ms;
 	size_t page, pactive, pdirty, pmuzzy, mapped, retained;
-	size_t base, internal, resident, metadata_thp, extent_avail;
+	size_t base, internal, resident, extent_avail;
 	uint64_t dirty_npurge, dirty_nmadvise, dirty_purged;
 	uint64_t muzzy_npurge, muzzy_nmadvise, muzzy_purged;
 	size_t small_allocated;
@@ -960,7 +960,6 @@ stats_arena_print(emitter_t *emitter, unsigned i, bool bins, bool large,
 	GET_AND_EMIT_MEM_STAT(retained)
 	GET_AND_EMIT_MEM_STAT(base)
 	GET_AND_EMIT_MEM_STAT(internal)
-	GET_AND_EMIT_MEM_STAT(metadata_thp)
 	GET_AND_EMIT_MEM_STAT(tcache_bytes)
 	GET_AND_EMIT_MEM_STAT(resident)
 	GET_AND_EMIT_MEM_STAT(abandoned_vm)
@@ -1072,7 +1071,6 @@ stats_general_print(emitter_t *emitter) {
 	OPT_WRITE_UNSIGNED("narenas")
 	OPT_WRITE_CHAR_P("percpu_arena")
 	OPT_WRITE_SIZE_T("oversize_threshold")
-	OPT_WRITE_CHAR_P("metadata_thp")
 	OPT_WRITE_BOOL_MUTABLE("background_thread", "background_thread")
 	OPT_WRITE_SSIZE_T_MUTABLE("dirty_decay_ms", "arenas.dirty_decay_ms")
 	OPT_WRITE_SSIZE_T_MUTABLE("muzzy_decay_ms", "arenas.muzzy_decay_ms")
@@ -1083,7 +1081,6 @@ stats_general_print(emitter_t *emitter) {
 	OPT_WRITE_BOOL("xmalloc")
 	OPT_WRITE_BOOL("tcache")
 	OPT_WRITE_SSIZE_T("lg_tcache_max")
-	OPT_WRITE_CHAR_P("thp")
 	OPT_WRITE_BOOL("prof")
 	OPT_WRITE_CHAR_P("prof_prefix")
 	OPT_WRITE_BOOL_MUTABLE("prof_active", "prof.active")
@@ -1236,7 +1233,7 @@ stats_print_helper(emitter_t *emitter, bool merged, bool destroyed,
 	 * These should be deleted.  We keep them around for a while, to aid in
 	 * the transition to the emitter code.
 	 */
-	size_t allocated, active, metadata, metadata_thp, resident, mapped,
+	size_t allocated, active, metadata, resident, mapped,
 	    retained;
 	size_t num_background_threads;
 	uint64_t background_thread_num_runs, background_thread_run_interval;
@@ -1244,7 +1241,6 @@ stats_print_helper(emitter_t *emitter, bool merged, bool destroyed,
 	CTL_GET("stats.allocated", &allocated, size_t);
 	CTL_GET("stats.active", &active, size_t);
 	CTL_GET("stats.metadata", &metadata, size_t);
-	CTL_GET("stats.metadata_thp", &metadata_thp, size_t);
 	CTL_GET("stats.resident", &resident, size_t);
 	CTL_GET("stats.mapped", &mapped, size_t);
 	CTL_GET("stats.retained", &retained, size_t);
@@ -1267,15 +1263,13 @@ stats_print_helper(emitter_t *emitter, bool merged, bool destroyed,
 	emitter_json_kv(emitter, "allocated", emitter_type_size, &allocated);
 	emitter_json_kv(emitter, "active", emitter_type_size, &active);
 	emitter_json_kv(emitter, "metadata", emitter_type_size, &metadata);
-	emitter_json_kv(emitter, "metadata_thp", emitter_type_size,
-	    &metadata_thp);
 	emitter_json_kv(emitter, "resident", emitter_type_size, &resident);
 	emitter_json_kv(emitter, "mapped", emitter_type_size, &mapped);
 	emitter_json_kv(emitter, "retained", emitter_type_size, &retained);
 
 	emitter_table_printf(emitter, "Allocated: %zu, active: %zu, "
-	    "metadata: %zu (n_thp %zu), resident: %zu, mapped: %zu, "
-	    "retained: %zu\n", allocated, active, metadata, metadata_thp,
+	    "metadata: %zu, resident: %zu, mapped: %zu, "
+	    "retained: %zu\n", allocated, active, metadata,
 	    resident, mapped, retained);
 
 	/* Background thread stats. */
