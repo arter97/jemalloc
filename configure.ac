@@ -1161,7 +1161,7 @@ else
   enable_stats="1"
 fi
 ],
-[enable_stats="1"]
+[enable_stats="0"]
 )
 if test "x$enable_stats" = "x1" ; then
   AC_DEFINE([JEMALLOC_STATS], [ ])
