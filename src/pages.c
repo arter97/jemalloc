@@ -26,7 +26,7 @@ static size_t	os_page;
 #  define PAGES_PROT_DECOMMIT (PROT_NONE)
 static int	mmap_flags;
 #endif
-static bool	os_overcommits;
+#define os_overcommits true
 
 const char *thp_mode_names[] = {
 	"default",
@@ -609,20 +609,6 @@ pages_boot(void) {
 #ifndef _WIN32
 	mmap_flags = MAP_PRIVATE | MAP_ANON;
 #endif
-
-#ifdef JEMALLOC_SYSCTL_VM_OVERCOMMIT
-	os_overcommits = os_overcommits_sysctl();
-#elif defined(JEMALLOC_PROC_SYS_VM_OVERCOMMIT_MEMORY)
-	os_overcommits = os_overcommits_proc();
-#  ifdef MAP_NORESERVE
-	if (os_overcommits) {
-		mmap_flags |= MAP_NORESERVE;
-	}
-#  endif
-#else
-	os_overcommits = false;
-#endif
-
 	init_thp_state();
 
 #ifdef __FreeBSD__
